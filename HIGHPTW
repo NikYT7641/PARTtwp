@@ -88,3 +88,49 @@ coroutine.wrap(animateRainbow)(increaseSpeedButton)
 coroutine.wrap(animateRainbow)(decreaseSpeedButton)
 coroutine.wrap(animateRainbow)(increaseJumpButton)
 coroutine.wrap(animateRainbow)(normalJumpButton)
+
+-- Скрипт для LocalScript, который должен быть помещен в StarterGui
+
+local screenGui = Instance.new("ScreenGui")
+local infiniteJumpButton = Instance.new("TextButton")
+
+-- Настройки ScreenGui
+screenGui.Parent = game.Players.LocalPlayer:WaitForChild("PlayerGui")
+screenGui.Name = "InfiniteJumpGui"
+
+-- Настройки кнопки
+infiniteJumpButton.Parent = screenGui
+infiniteJumpButton.Text = "Бесконечный Прыжок"
+infiniteJumpButton.TextScaled = true -- Автоматически масштабирует текст, чтобы он помещался в кнопку
+infiniteJumpButton.Size = UDim2.new(0, 150, 0, 50) -- Увеличенный размер кнопки
+infiniteJumpButton.Position = UDim2.new(1, -160, 0, 10) -- В правом верхнем углу
+infiniteJumpButton.BackgroundColor3 = Color3.fromRGB(255, 0, 0)
+
+-- Функция для бесконечного прыжка
+local function onButtonClicked()
+    local player = game.Players.LocalPlayer
+    local humanoid = player.Character:FindFirstChildOfClass("Humanoid")
+    
+    if humanoid then
+        humanoid.JumpPower = 50
+        humanoid.JumpHeight = 50
+        local oldJump = humanoid:GetPropertyChangedSignal("Jump"):Connect(function()
+            humanoid:ChangeState(Enum.HumanoidStateType.Jumping)
+        end)
+        
+        infiniteJumpButton.MouseButton1Click:Connect(function()
+            if oldJump.Connected then
+                oldJump:Disconnect()
+                humanoid.JumpPower = 50
+                humanoid.JumpHeight = 50
+            else
+                oldJump = humanoid:GetPropertyChangedSignal("Jump"):Connect(function()
+                    humanoid:ChangeState(Enum.HumanoidStateType.Jumping)
+                end)
+            end
+        end)
+    end
+end
+
+-- Событие нажатия на кнопку
+infiniteJumpButton.MouseButton1Click:Connect(onButtonClicked)
